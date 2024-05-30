@@ -20,4 +20,10 @@ set(CMAKE_CXX_STANDARD 23)
 
 add_executable(tic_tac_toe main.cpp
         TicTacToeAI.cpp
-        TicTacToeAI.h)
+        TicTacToeAI.h
+        WindowCreator.cpp
+        WindowCreator.h
+        Utils.cpp
+        Utils.h
+        windows/GameWindow.cpp
+)
