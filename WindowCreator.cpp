@@ -5,21 +5,14 @@
 #include "WindowCreator.h"
 #include "ctime"
 #include "Utils.h"
+#include "Utils.h"
+#include <codecvt>
 
 void WindowCreator::createText(const std::string& text) {
-    RECT rect = this->rect();
-
-    int windowWidth = rect.right - rect.left;
-    int windowHeight = rect.bottom - rect.top;
-
-    HFONT hFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
-    HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
-
-    SetTextAlign(hdc, TA_CENTER | TA_BASELINE);
-
-    TextOut(hdc, windowWidth / 2, windowHeight/6, text.c_str(), text.length());
-
-    SelectObject(hdc, hOldFont);
+    RECT rect;
+    GetClientRect(this->hWnd, &rect);
+    rect.top = 60;
+    DrawTextW(hdc, TEXT(Utils::stringToWstring(text).c_str()), text.size(), &rect, DT_CENTER);
 }
 
 void WindowCreator::setHdc(HDC hdc) {
@@ -56,15 +49,31 @@ void WindowCreator::createButton(std::string label, int x, int y, int width, int
 }
 
 void WindowCreator::handleEvent(int id) {
-    std::cout << events.size();
 //    auto it = this->events.find(id);
 //    if (it != this->events.end()) {
 //        it->second();
 //    } else {
 //        std::cout << "Funkcja nieznaleziona!" << std::endl;
 //    }
+//    for (const auto &item: this->events) {
+//        std::cout << item.first << " " << item.second << std::endl;
+//    }
 }
 
 void WindowCreator::addEvent(int id, std::string func) {
     events[id] = func;
+}
+
+bool WindowCreator::registerClass(WNDPROC proc, HINSTANCE hInstance, const std::wstring &className) {
+    WNDCLASSW wc = { 0 };
+    wc.lpfnWndProc = proc;
+    wc.hInstance = hInstance;
+    wc.lpszClassName = className.c_str();
+
+    if (!RegisterClassW(&wc)) {
+        MessageBoxW(NULL, L"RegisterClass failed!", L"Error", MB_ICONERROR);
+        return false;
+    }
+
+    return true;
 }

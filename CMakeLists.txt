@@ -19,11 +19,13 @@ set(CMAKE_CXX_STANDARD 23)
 #target_link_libraries(${PROJECT_NAME} imgui)
 
 add_executable(tic_tac_toe main.cpp
-        TicTacToeAI.cpp
-        TicTacToeAI.h
+        game/TicTacToeAI.cpp
+        game/TicTacToeAI.h
         WindowCreator.cpp
         WindowCreator.h
         Utils.cpp
         Utils.h
         windows/GameWindow.cpp
+        game/TicTacToe.cpp
+        game/TicTacToe.h
 )

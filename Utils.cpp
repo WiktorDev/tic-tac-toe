@@ -12,3 +12,8 @@ int Utils::randomId() {
     std::uniform_int_distribution<> dis(100000, 999999);
     return dis(gen);
 }
+
+std::wstring Utils::stringToWstring(const std::string &str) {
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    return converter.from_bytes(str);
+}

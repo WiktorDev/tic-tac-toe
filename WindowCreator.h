@@ -29,6 +29,9 @@ public:
     void setHdc(HDC hdc);
 
     void handleEvent(int id);
+
+    static bool registerClass(WNDPROC proc, HINSTANCE hInstance, const std::wstring& className);
+    static HWND createWindow(const std::wstring& windowName, int width, int height);
 };
 
 

@@ -7,10 +7,10 @@
 using namespace std;
 
 std::string TicTacToeAI::printGameState(int state) {
-    if (WIN == state) return "WIN";
-    else if (DRAW == state) return "DRAW";
-    else if (LOSS == state) return "LOSS";
-    else return "";
+    if (WIN == state) return "Wygrałeś";
+    else if (DRAW == state) return "Remis";
+    else if (LOSS == state) return "Komputer wygrał";
+    else return "Niepoprawny status";
 }
 
 vector<pair<int, int>> TicTacToeAI::getLegalMoves() {
