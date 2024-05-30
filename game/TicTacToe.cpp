@@ -5,7 +5,6 @@
 #include "TicTacToe.h"
 #include "iostream"
 void TicTacToe::drawMarkers(HDC hdc) {
-    std::cout << "chjuj" << std::endl;
     int padding = 15;
     for (int y = 0; y < GRID_SIZE; ++y) {
         for (int x = 0; x < GRID_SIZE; ++x) {
