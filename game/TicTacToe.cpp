@@ -3,10 +3,10 @@
 //
 
 #include "TicTacToe.h"
-#include "iostream"
-void TicTacToe::drawMarkers(HDC hdc) {
-    std::cout << "chjuj" << std::endl;
+
+void TicTacToe::drawMarkers(HDC hdc, bool clear = false) {
     int padding = 15;
+    if(clear) this->clearGrid();
     for (int y = 0; y < GRID_SIZE; ++y) {
         for (int x = 0; x < GRID_SIZE; ++x) {
             if (grid[y][x] == 'X') {

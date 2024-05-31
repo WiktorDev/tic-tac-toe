@@ -30,21 +30,20 @@ RECT WindowCreator::rect() {
     return rect;
 }
 
-void WindowCreator::createButton(std::string label, int x, int y, int width, int height, Function func) {
-    int id = Utils::randomId();
+void WindowCreator::createButton(std::string label, int x, int y, int width, int height, int id) {
     std::string controlClass = "BUTTON";
     HWND hwndButton = CreateWindow(
             controlClass.c_str(),
             label.c_str(),
-            WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styl przycisku
-            x,         // Pozycja X
-            y,         // Pozycja Y
-            width,        // Szerokość
-            height,         // Wysokość
-            this->hWnd,       // Rodzic
-            (HMENU)1,   // Id przycisku
+            WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
+            x,
+            y,
+            width,
+            height,
+            this->hWnd,
+            (HMENU)id,
             (HINSTANCE)GetWindowLongPtr(this->hWnd, GWLP_HINSTANCE),
-            NULL);      // Dodatkowe dane
+            NULL);
     this->addEvent(id, label);
 }
 

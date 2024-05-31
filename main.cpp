@@ -45,12 +45,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     WindowCreator *creator = new WindowCreator(hwnd, lParam);
     switch (uMsg) {
         case WM_CREATE: {
-            creator->createButton("Graj z komputerem", 20, 100, 250, 30, []() -> void {
-                cout << "Clicked 1";
-            });
-//            creator->createButton("Graj ze znajomym", 20, 140, 250, 30, []() -> void {
-//                cout << "Clicked 2";
-//            });
+            creator->createButton("Graj z komputerem", 20, 100, 250, 30, 1);
+            creator->createButton("Graj ze znajomym", 20, 140, 250, 30, 2);
             return 0;
         }
         case WM_PAINT: {
@@ -83,6 +79,24 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                 ShowWindow(gameHwnd, SW_SHOW);
                 UpdateWindow(gameHwnd);
             }
+            if(LOWORD(wParam) == 2) {
+                game->clearGrid();
+                game->withAi = false;
+                HINSTANCE hInstance = GetModuleHandleW(nullptr);
+                HWND gameHwnd = CreateWindowW(
+                        L"GameWindowClass",
+                        L"Gra ze znajomym",
+                        WS_OVERLAPPEDWINDOW,
+                        CW_USEDEFAULT,
+                        CW_USEDEFAULT,
+                        WINDOW_SIZE+17, WINDOW_SIZE+40,
+                        nullptr, nullptr,
+                        hInstance,
+                        nullptr
+                );
+                ShowWindow(gameHwnd, SW_SHOW);
+                UpdateWindow(gameHwnd);
+            }
             return 0;
         }
         case WM_DESTROY:
@@ -92,30 +106,27 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-void DrawGrid(HWND hwnd) {
-    PAINTSTRUCT ps;
-    HDC hdc = BeginPaint(hwnd, &ps);
-
-    for (int i = 0; i <= GRID_SIZE; ++i) {
-        HPEN pen = CreatePen(PS_SOLID, 3, RGB(255, 0, 0));
-        SelectObject(hdc, pen);
-
-        MoveToEx(hdc, i * CELL_SIZE, 0, nullptr);
-        LineTo(hdc, i * CELL_SIZE, WINDOW_SIZE);
-        MoveToEx(hdc, 0, i * CELL_SIZE, nullptr);
-        LineTo(hdc, WINDOW_SIZE, i * CELL_SIZE);
-    }
-
-    game->drawMarkers(hdc);
-    EndPaint(hwnd, &ps);
-}
-
 LRESULT CALLBACK GameWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     TicTacToeAI *ai = new TicTacToeAI(game->grid);
 
     switch (uMsg) {
         case WM_PAINT: {
-            DrawGrid(hwnd);
+            PAINTSTRUCT ps;
+            HDC hdc = BeginPaint(hwnd, &ps);
+
+            for (int i = 0; i <= GRID_SIZE; ++i) {
+                HPEN pen = CreatePen(PS_SOLID, 3, RGB(255, 0, 0));
+                SelectObject(hdc, pen);
+
+                MoveToEx(hdc, i * CELL_SIZE, 0, nullptr);
+                LineTo(hdc, i * CELL_SIZE, WINDOW_SIZE);
+                MoveToEx(hdc, 0, i * CELL_SIZE, nullptr);
+                LineTo(hdc, WINDOW_SIZE, i * CELL_SIZE);
+            }
+
+            game->drawMarkers(hdc, LOWORD(wParam) == 1);
+            EndPaint(hwnd, &ps);
+
             PostMessageW(hwnd, WM_COMMAND, 2137, 0);
             break;
         }
@@ -127,6 +138,7 @@ LRESULT CALLBACK GameWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
                     switch(result) {
                         case 4:
                             game->clearGrid();
+                            PostMessage(hwnd, WM_PAINT, 1, 0);
                             InvalidateRect(hwnd, nullptr, TRUE);
                             break;
                         case 2:
@@ -145,9 +157,15 @@ LRESULT CALLBACK GameWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
             if (x < GRID_SIZE && y < GRID_SIZE) {
                 if(ai->positionOccupied(make_pair(x, y))) break;
-                game->set(x, y, PLAYER_MARKER);
-                pair<int, pair<int, int>> ai_move = ai->minimaxOptimization(AI_MARKER, 0, LOSS, WIN);
-                game->set(ai_move.second.first, ai_move.second.second, AI_MARKER);
+
+                if(game->withAi) {
+                    game->set(x, y, PLAYER_MARKER);
+                    pair<int, pair<int, int>> ai_move = ai->minimaxOptimization(OPPONENT_MARKER, 0, LOSS, WIN);
+                    game->set(ai_move.second.first, ai_move.second.second, OPPONENT_MARKER);
+                } else {
+                    game->set(x, y, game->move);
+                    game->move = game->move == PLAYER_MARKER ? OPPONENT_MARKER : PLAYER_MARKER;
+                }
                 InvalidateRect(hwnd, nullptr, TRUE);
             }
             break;

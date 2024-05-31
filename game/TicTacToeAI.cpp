@@ -9,7 +9,7 @@ using namespace std;
 std::string TicTacToeAI::printGameState(int state) {
     if (WIN == state) return "Wygrałeś";
     else if (DRAW == state) return "Remis";
-    else if (LOSS == state) return "Komputer wygrał";
+    else if (LOSS == state) return "Przeciwnik wygrał!";
     else return "Niepoprawny status";
 }
 
@@ -17,7 +17,7 @@ vector<pair<int, int>> TicTacToeAI::getLegalMoves() {
     vector<pair<int, int>> legal_moves;
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
-            if (board[i][j] != AI_MARKER && board[i][j] != PLAYER_MARKER) {
+            if (board[i][j] != OPPONENT_MARKER && board[i][j] != PLAYER_MARKER) {
                 legal_moves.emplace_back(i, j);
             }
         }
@@ -73,7 +73,7 @@ bool TicTacToeAI::gameIsWon(vector<std::pair<int, int>> occupied_positions) {
 char TicTacToeAI::getOpponentMarker(char marker) {
     char opponent_marker;
     if (marker == PLAYER_MARKER) {
-        opponent_marker = AI_MARKER;
+        opponent_marker = OPPONENT_MARKER;
     } else {
         opponent_marker = PLAYER_MARKER;
     }
@@ -94,13 +94,12 @@ int TicTacToeAI::getBoardState(char marker) {
 }
 
 pair<int, pair<int, int>> TicTacToeAI::minimaxOptimization(char marker, int depth, int alpha, int beta) {
-    // Initialize best move
     pair<int, int> best_move = std::make_pair(-1, -1);
-    int best_score = (marker == AI_MARKER) ? LOSS : WIN;
+    int best_score = (marker == OPPONENT_MARKER) ? LOSS : WIN;
 
     // If we hit a terminal state (leaf node), return the best score and move
-    if (this->boardIsFull() || DRAW != this->getBoardState(AI_MARKER)) {
-        best_score = this->getBoardState(AI_MARKER);
+    if (this->boardIsFull() || DRAW != this->getBoardState(OPPONENT_MARKER)) {
+        best_score = this->getBoardState(OPPONENT_MARKER);
         return std::make_pair(best_score, best_move);
     }
 
@@ -109,40 +108,33 @@ pair<int, pair<int, int>> TicTacToeAI::minimaxOptimization(char marker, int dept
     for (auto curr_move : legal_moves) {
         board[curr_move.first][curr_move.second] = marker;
 
-        // Maximizing player's turn
-        if (marker == AI_MARKER) {
+        if (marker == OPPONENT_MARKER) {
             int score = this->minimaxOptimization(PLAYER_MARKER, depth + 1, alpha, beta).first;
-            // Get the best scoring move
             if (best_score < score) {
                 best_score = score - depth * 10;
                 best_move = curr_move;
-                // Check if this branch's best move is worse than the best
-                // option of a previously search branch. If it is, skip it
                 alpha = std::max(alpha, best_score);
                 board[curr_move.first][curr_move.second] = EMPTY_SPACE;
                 if (beta <= alpha) break;
             }
         } else {
-            int score = this->minimaxOptimization(AI_MARKER, depth + 1, alpha, beta).first;
+            int score = this->minimaxOptimization(OPPONENT_MARKER, depth + 1, alpha, beta).first;
             if (best_score > score) {
                 best_score = score + depth * 10;
                 best_move = curr_move;
-                // Check if this branch's best move is worse than the best
-                // option of a previously search branch. If it is, skip it
                 beta = std::min(beta, best_score);
                 board[curr_move.first][curr_move.second] = EMPTY_SPACE;
                 if (beta <= alpha) break;
             }
         }
-        board[curr_move.first][curr_move.second] = EMPTY_SPACE; // Undo move
+        board[curr_move.first][curr_move.second] = EMPTY_SPACE;
     }
     return std::make_pair(best_score, best_move);
 }
 
 bool TicTacToeAI::gameIsDone() {
-
     if (this->boardIsFull()) return true;
-    if (DRAW != this->getBoardState(AI_MARKER)) return true;
+    if (DRAW != this->getBoardState(OPPONENT_MARKER)) return true;
     return false;
 }
 

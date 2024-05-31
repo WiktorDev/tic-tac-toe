@@ -25,7 +25,7 @@ class WindowCreator {
 public:
     WindowCreator(HWND hwnd, LPARAM lparam);
     void createText(const std::string& text);
-    void createButton(std::string label, int x, int y, int width, int height, void (*func)());
+    void createButton(std::string label, int x, int y, int width, int height, int id);
     void setHdc(HDC hdc);
 
     void handleEvent(int id);

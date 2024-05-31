@@ -5,15 +5,13 @@
 #ifndef TIC_TAC_TOE_TICTACTOEAI_H
 #define TIC_TAC_TOE_TICTACTOEAI_H
 
-#define AI_MARKER 'O'
-#define PLAYER_MARKER 'X'
-
 #define WIN 1000
 #define	DRAW 0
 #define LOSS -1000
 
 #define EMPTY_SPACE '-'
 
+#include "TicTacToe.h"
 #include<iostream>
 #include <vector>
 #include <algorithm>
